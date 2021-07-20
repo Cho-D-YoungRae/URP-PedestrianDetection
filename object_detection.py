@@ -237,7 +237,7 @@ class SSD300(nn.Module):
         :param image: images, a tensor of dimensions (N, 3, 300, 300)
         :return: 8732 locations and class scores (i.e. w.r.t each prior box) for each image
         """
-        # Run VGG base network convolutions (lower level feature map generators)
+        # Run VGG base network convolutions (lower level feature map generators) 
         conv4_3_feats, conv7_feats = self.base(image)  # (N, 512, 38, 38), (N, 1024, 19, 19)
 
         # Rescale conv4_3 after L2 norm

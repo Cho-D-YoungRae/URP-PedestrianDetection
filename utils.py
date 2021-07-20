@@ -121,7 +121,7 @@ def find_jaccard_overlap(set_1, set_2):
     return intersection / union  # (n1, n2)
 
 
-def save_checkpoint(epoch, model, optimizer, ckpt_path='checkpoint_ssd300'):
+def save_checkpoint(epoch, model, optimizer, ckpt_path='checkpoint_ssd300.pth.tar'):
     """
     Save model checkpoint.
 
@@ -132,7 +132,7 @@ def save_checkpoint(epoch, model, optimizer, ckpt_path='checkpoint_ssd300'):
     state = {'epoch': epoch,
              'model': model,
              'optimizer': optimizer}
-    filename = os.path.join(ckpt_path + '.pth.tar')
+    filename = os.path.join(ckpt_path)
     torch.save(state, filename)
 
 
