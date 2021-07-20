@@ -52,7 +52,6 @@ class VGGBase(nn.Module):
         :param image: images, a tensor of dimensions (N, 3, 300, 300)
         :return: lower-level feature maps conv4_3 and conv7
         """
-        import pdb; pdb.set_trace()
         out = F.relu(self.conv1_1(image))  # (N, 64, 300, 300)
         out = F.relu(self.conv1_2(out))  # (N, 64, 300, 300)
         out = self.pool1(out)  # (N, 64, 150, 150)
