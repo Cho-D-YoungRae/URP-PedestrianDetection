@@ -1,5 +1,5 @@
 import torch
-import torchvision.transforms.functional as FT
+import torchvision.transforms.functional as TF
 
 
 def resize(image, boxes, dims=(300, 300), return_percent_coords=True):
@@ -14,7 +14,7 @@ def resize(image, boxes, dims=(300, 300), return_percent_coords=True):
     :return: resized image, updated bounding box coordinates (or fractional coordinates, in which case they remain the same)
     """
     # Resize image
-    new_image = FT.resize(image, dims)
+    new_image = TF.resize(image, dims)
 
     # Resize bounding boxes
     old_dims = torch.FloatTensor([image.width, image.height, image.width, image.height]).unsqueeze(0)
@@ -43,7 +43,7 @@ def transform(image, bboxes, category_ids, is_crowds, img_type, split):
     new_difficulties = is_crowds
 
     new_image, new_boxes = resize(new_image, new_boxes, dims=(300, 300))
-    new_image = FT.to_tensor(new_image)
-    new_image = FT.normalize(new_image, mean=mean, std=std)
+    new_image = TF.to_tensor(new_image)
+    new_image = TF.normalize(new_image, mean=mean, std=std)
 
     return new_image, new_boxes, new_labels, new_difficulties

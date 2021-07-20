@@ -121,6 +121,18 @@ def find_jaccard_overlap(set_1, set_2):
     return intersection / union  # (n1, n2)
 
 
+def adjust_learning_rate(optimizer, scale):
+    """
+    Scale learning rate by a specified factor.
+
+    :param optimizer: optimizer whose learning rate must be shrunk.
+    :param scale: factor to multiply learning rate with.
+    """
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = param_group['lr'] * scale
+    print("DECAYING learning rate.\n The new LR is %f\n" % (optimizer.param_groups[1]['lr'],))
+
+
 def save_checkpoint(epoch, model, optimizer, ckpt_path='checkpoint_ssd300.pth.tar'):
     """
     Save model checkpoint.
