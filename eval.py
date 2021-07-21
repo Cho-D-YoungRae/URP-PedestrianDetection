@@ -24,7 +24,7 @@ def get_object_list(model,
         if one_ch_option == 'mean':
             mean = sum(mean) / len(mean)
             std = sum(std) / len(std)
-    image = TF.normalize(TF.to_tensor(TF.resize(original_image)),
+    image = TF.normalize(TF.to_tensor(TF.resize(original_image, size=(300, 300))),
                          mean=mean, std=std)
 
     # Move to default device
