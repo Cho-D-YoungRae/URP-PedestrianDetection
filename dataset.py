@@ -13,7 +13,7 @@ class KaistPDDataset(Dataset):
     def __init__(self, 
                  data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
                  ch_option: Optional[str]="mean",
-                 transform: Optional[function]=default_transform,
+                 transform=default_transform,
                  split: str='train',
                  keep_strange: bool=False,
                  ):
