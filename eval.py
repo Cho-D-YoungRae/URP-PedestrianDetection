@@ -84,7 +84,7 @@ def evaluate(model,
             data_dir, img_dir, img_type, img_name)
         image = Image.open(img_path)
         if img_type == 'lwir':
-            image.convert('L')
+            image = image.convert('L')
 
         det_boxes, det_labels, det_scores = get_object_list(model=model,
                                                             original_image=image,
