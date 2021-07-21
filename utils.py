@@ -1,6 +1,9 @@
 import torch
 import os
 
+label_map = {'background': 0, 'person': 1}
+rev_label_map = {v: k for k, v in label_map.items()} 
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def decimate(tensor, m):
