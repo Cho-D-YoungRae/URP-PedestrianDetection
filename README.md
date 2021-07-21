@@ -7,6 +7,7 @@
 - [ ] vgg16_bn 을 통해 VGGbnBase 만들어보기
 - [ ] ResNetBase 만들어 보기
 - [ ] DataAugmentation 적용
+
 ## Question
 - [ ] convolution, fully-connected layer 에서 bias 를 사용할 때와 사용하지 않을 때의 차이
 ## Problem
@@ -30,3 +31,7 @@
 ### 3
 - baseline2 에서 lr = 5e-4 로 줄이고 다시 해봄
 - transform: resize + to_tensor + normalize
+
+### 4
+- 리더보드 baseline 성능 원복을 위해 SSD tutorial 의 data augmentation 다시 적용 및 validation 으로 나누지 않고 진행
+- lr 는 5e-4 로 줄어든 상태로 진행

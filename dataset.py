@@ -4,6 +4,7 @@ import torch
 import json
 import os
 from PIL import Image
+from typing import function
 from transforms import default_transform
 
 
