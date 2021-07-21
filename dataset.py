@@ -1,29 +1,31 @@
+from typing import Optional
 from torch.utils.data import Dataset
 import torch
 import json
 import os
 from PIL import Image
-from transforms import transform
+from transforms import default_transform
 
 
 class KaistPDDataset(Dataset):
 
     def __init__(self, 
                  data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
-                 split='train',
-                 keep_strange=False,
-                 img_type='lwir',
-                 one_ch_option="mean"
+                 ch_option: Optional[str]="mean",
+                 transform: Optional[function]=default_transform,
+                 split: str='train',
+                 keep_strange: bool=False,
                  ):
         self.split = split.lower()
-        self.keep_strange = keep_strange
-        self.img_type = img_type
-        self.one_ch_option = one_ch_option
         self.data_dir = data_dir
+        self.keep_strange = keep_strange
+        self.ch_option = ch_option
+        self.transform = transform
+        self.img_type = 'lwir' if self.ch_option else 'visible'
         self.img_conversion = 'L' if self.img_type == 'lwir' else 'RGB'
 
         assert self.split in {'train', 'test'}
-        assert self.img_type in {'lwir', 'visible'}
+        assert self.ch_option in {'mean'}
 
         data_name_txt = self.split + '-all-20.txt'
         with open(os.path.join(data_dir, data_name_txt), 'r') as f:
@@ -71,9 +73,9 @@ class KaistPDDataset(Dataset):
         category_ids = torch.LongTensor(category_ids)
         is_crowds = torch.ByteTensor(is_crowds)
 
-        image, bboxes, category_ids, is_crowds =\
-            transform(image, bboxes, category_ids, is_crowds,
-                      self.img_type, split=self.split)
+        if self.transform:
+            image, bboxes, category_ids, is_crowds =\
+                self.transform(image, bboxes, category_ids, is_crowds, self.ch_option)
 
         return image, bboxes, category_ids, is_crowds
     
