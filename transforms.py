@@ -26,7 +26,8 @@ def expand(image, boxes, filler):
 
     # Create such an image with the filler
     filler = torch.FloatTensor(filler)  # (3)
-    new_image = torch.ones((3, new_h, new_w), dtype=torch.float) * filler.unsqueeze(1).unsqueeze(1)  # (3, new_h, new_w)
+    num_channel = image.size(0)
+    new_image = torch.ones((num_channel, new_h, new_w), dtype=torch.float) * filler.unsqueeze(1).unsqueeze(1)  # (3, new_h, new_w)
     # Note - do not use expand() like new_image = filler.unsqueeze(1).unsqueeze(1).expand(3, new_h, new_w)
     # because all expanded values will share the same memory, so changing one pixel will change all
 
@@ -183,12 +184,19 @@ def photometric_distort(image):
     :return: distorted image
     """
     new_image = image
-    is_one_ch = len(image.split()) == 1
-    distortions = [TF.adjust_brightness]
-    if is_one_ch:
-        distortions += [TF.adjust_contrast,
-                        TF.adjust_saturation,
-                        TF.adjust_hue]
+    ###############################################
+    # is_one_ch = len(image.split()) == 1
+    # distortions = [TF.adjust_brightness]
+    # if is_one_ch:
+    #     distortions += [TF.adjust_contrast,
+    #                     TF.adjust_saturation,
+    #                     TF.adjust_hue]
+    ###############################################    
+    distortions = [TF.adjust_brightness,
+                   TF.adjust_contrast,
+                   TF.adjust_saturation,
+                   TF.adjust_hue]
+    ###############################################
 
     random.shuffle(distortions)
 
