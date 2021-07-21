@@ -232,8 +232,8 @@ def default_transform(image, bboxes, category_ids, is_crowds, ch_option):
     std = [0.229, 0.224, 0.225]
     
     if ch_option == 'mean':
-        mean = sum(mean) / len(mean)
-        std = sum(std) / len(std)
+        mean = [sum(mean) / len(mean)]
+        std = [sum(std) / len(std)]
 
     new_image = image
     new_bboxes = bboxes
