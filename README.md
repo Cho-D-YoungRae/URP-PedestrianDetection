@@ -26,7 +26,7 @@
 - transform: resize + to_tensor + normalize
 - 30 epoch 정도 이후 loss 가 nan 이 되는 현상 발생
 - loss 가 완만하게 떨어지고 있었으므로 발산 등은 아닌 것 같다.
-- score: 43.63% epoch 25
+- score: 43.63% (epoch 25)
 
 ### 3
 - baseline2 에서 lr = 5e-4 로 줄이고 다시 해봄

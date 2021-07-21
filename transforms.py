@@ -183,11 +183,12 @@ def photometric_distort(image):
     :return: distorted image
     """
     new_image = image
-
-    distortions = [TF.adjust_brightness,
-                   TF.adjust_contrast,
-                   TF.adjust_saturation,
-                   TF.adjust_hue]
+    is_one_ch = len(image.split()) == 1
+    distortions = [TF.adjust_brightness]
+    if is_one_ch:
+        distortions += [TF.adjust_contrast,
+                        TF.adjust_saturation,
+                        TF.adjust_hue]
 
     random.shuffle(distortions)
 

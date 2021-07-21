@@ -21,7 +21,7 @@ class KaistPDDataset(Dataset):
         self.keep_strange = keep_strange
         self.ch_option = ch_option
         self.transform = transform
-        self.img_type = 'lwir' if self.ch_option else 'visible'
+        self.img_type = 'lwir' if self.ch_option in {'mean'} else 'visible'
         self.img_conversion = 'L' if self.img_type == 'lwir' else 'RGB'
 
         assert self.split in {'train', 'test'}
