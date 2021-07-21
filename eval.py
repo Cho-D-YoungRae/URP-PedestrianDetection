@@ -55,7 +55,6 @@ def get_object_list(model,
 
 
 def evaluate(model,
-             original_image,
              min_score,
              max_overlap,
              top_k,
@@ -93,12 +92,20 @@ def evaluate(model,
                                                             max_overlap=max_overlap,
                                                             top_k=top_k,
                                                             one_ch_option=one_ch_option)
+        
         for i in range(len(det_labels)):
+            det_label = det_labels[i]
+            det_box = det_boxes[i]
+            det_score = det_scores[i]
+            x_min, y_min, x_max, y_max = det_box
+            cx, cy = (x_max + x_min) / 2, (y_max + y_min) / 2
+            w, h = (x_max - x_min) / 2, (y_max - y_min) / 2
+            det_box = [cx, cy, w, h]
             detection = {
                 "image_id": image_id,
-                "category_id": det_labels[i],
-                "bbox": det_boxes[i],
-                "score": det_scores[i]
+                "category_id": det_label,
+                "bbox": det_box,
+                "score": det_score
             }
             detections.append(detection)
             
