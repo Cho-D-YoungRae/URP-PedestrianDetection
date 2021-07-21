@@ -98,9 +98,8 @@ def evaluate(model,
             det_box = det_boxes[i]
             det_score = det_scores[i]
             x_min, y_min, x_max, y_max = det_box
-            cx, cy = (x_max + x_min) / 2, (y_max + y_min) / 2
-            w, h = (x_max - x_min) / 2, (y_max - y_min) / 2
-            det_box = [cx, cy, w, h]
+            w, h = (x_max - x_min) , (y_max - y_min)
+            det_box = [x_min, y_min, w, h]
             detection = {
                 "image_id": image_id,
                 "category_id": det_label,
