@@ -6,6 +6,7 @@ from PIL import Image
 from tqdm.auto import tqdm
 import json
 import Evaluation_official
+import os.path
 
 
 def get_object_list(model,
@@ -58,9 +59,10 @@ def evaluate(model,
              min_score=0.2,
              max_overlap=0.5,
              top_k=200,
-             data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
              img_type='lwir',
-             one_ch_option='mean'):
+             one_ch_option='mean',
+             json_path='submission.json',
+             data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD"):
     assert img_type in {'lwir'}
     assert one_ch_option in {'mean'}
     
@@ -108,8 +110,8 @@ def evaluate(model,
             }
             detections.append(detection)
             
-    submission_name = './submission.json'
-    with open(submission_name, 'w', encoding='utf-8') as j:
+    json_path = os.path.join(json_path)
+    with open(json_path, 'w', encoding='utf-8') as j:
         json.dump(detections, j, indent='\t')
         
-    Evaluation_official.evaluate_coco(submission_name)
+    Evaluation_official.evaluate_coco(json_path)
