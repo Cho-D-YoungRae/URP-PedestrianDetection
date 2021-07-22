@@ -33,5 +33,5 @@ def evaluate_coco(test_json_path):
 
 if __name__ == '__main__':
 
-    test_json_path = './prediction_example.json'
+    test_json_path = './submission.json'
     evaluate_coco(test_json_path)

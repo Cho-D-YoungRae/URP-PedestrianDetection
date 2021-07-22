@@ -438,9 +438,9 @@ class MultiBoxLoss(nn.Module):
         self.neg_pos_ratio = neg_pos_ratio
         self.alpha = alpha
 
-        self.smooth_l1 = nn.L1Loss()
         ## 논문에 따라 nn.L1Loss -> SmoothL1Loss 수정해야할듯..
-        # self.smooth_l1 = nn.SmoothL1Loss()
+        # self.smooth_l1 = nn.L1Loss()
+        self.smooth_l1 = nn.SmoothL1Loss()
         
         self.cross_entropy = nn.CrossEntropyLoss(reduce=False)
 
