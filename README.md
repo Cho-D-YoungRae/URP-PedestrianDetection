@@ -35,3 +35,7 @@
 ### 4
 - 리더보드 baseline 성능 원복을 위해 SSD tutorial 의 data augmentation 다시 적용 및 validation 으로 나누지 않고 진행
 - lr 는 5e-4 로 줄어든 상태로 진행
+
+### 5
+- 4와 같은 세팅에서 train - validation set 으로 구분해주었다.
+- 이를 바탕으로 추후 성능 비교해보자

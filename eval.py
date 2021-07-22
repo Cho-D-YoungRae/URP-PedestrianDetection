@@ -55,9 +55,9 @@ def get_object_list(model,
 
 
 def evaluate(model,
-             min_score,
-             max_overlap,
-             top_k,
+             min_score=0.2,
+             max_overlap=0.5,
+             top_k=200,
              data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
              img_type='lwir',
              one_ch_option='mean'):
