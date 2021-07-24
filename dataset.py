@@ -5,13 +5,27 @@ import json
 import os
 from PIL import Image
 from transforms import default_transform
+import torchvision.transforms.functional as TF
 
+"""
+ch_options
+num_ch: 1, img_type: lwir, one_ch_option: mean
+num_ch: 3, img_type: visible
+num_ch: 3, img_type: add
+
+ch_options_X
+num_ch: 4, img_type: all, one_ch_option: mean
+"""
+
+default_ch_option = {'num_ch': 1,
+                     'img_type': 'lwir',
+                     'one_ch_option': 'mean'}
 
 class KaistPDDataset(Dataset):
 
     def __init__(self, 
                  data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
-                 ch_option: Optional[str]="mean",
+                 ch_option=default_ch_option,
                  transform=default_transform,
                  split: str='train',
                  keep_strange: bool=False,
@@ -21,11 +35,8 @@ class KaistPDDataset(Dataset):
         self.keep_strange = keep_strange
         self.ch_option = ch_option
         self.transform = transform
-        self.img_type = 'lwir' if self.ch_option in {'mean'} else 'visible'
-        self.img_conversion = 'L' if self.img_type == 'lwir' else 'RGB'
 
         assert self.split in {'train', 'test'}
-        assert self.ch_option in {'mean'}
 
         data_name_txt = self.split + '-all-20.txt'
         with open(os.path.join(data_dir, data_name_txt), 'r') as f:
@@ -43,19 +54,14 @@ class KaistPDDataset(Dataset):
         ))
 
         assert len(self.anno_paths) == len(self.img_paths)
-
+    
     
     def __len__(self):
         return len(self.img_paths)
 
 
     def __getitem__(self, idx):
-        img_dir, img_name = os.path.split(self.img_paths[idx])
-        img_path = os.path.join(
-            self.data_dir, img_dir, self.img_type, img_name)
-        image = Image.open(img_path)
-        image = image.convert(self.img_conversion)
-        
+        image = self._get_image(idx)
 
         with open(os.path.join(self.data_dir, self.anno_paths[idx]), 'r') as j:
             annotations = json.load(j)['annotation']
@@ -78,6 +84,35 @@ class KaistPDDataset(Dataset):
                 self.transform(image, bboxes, category_ids, is_crowds, self.ch_option)
 
         return image, bboxes, category_ids, is_crowds
+    
+    def _get_image(self, idx):
+        img_dir, img_name = os.path.split(self.img_paths[idx])
+        if self.ch_option.get('num_ch') == 1:
+            if self.ch_option.get('img_type') in {'lwir', 'visible'}:
+                img_path = os.path.join(
+                    self.data_dir, img_dir, self.ch_option.get('img_type'), img_name)
+                image = Image.open(img_path)
+                image = image.convert('L')
+
+        elif self.ch_option.get('num_ch') == 3:
+            if self.ch_option.get('img_type') in {'lwir', 'visible'}:
+                img_path = os.path.join(
+                    self.data_dir, img_dir, self.ch_option.get('img_type'), img_name)
+                image = Image.open(img_path)
+                image = image.convert('RGB')
+            elif self.ch_option.get('img_type') == 'add':
+                c_img_path = os.path.join(
+                    self.data_dir, img_dir, 'visible', img_name)
+                c_image = Image.open(c_img_path)
+                
+                t_img_path = os.path.join(
+                    self.data_dir, img_dir, 'lwir', img_name)
+                t_image = Image.open(t_img_path)
+                
+                image = (TF.to_tensor(c_image) + TF.to_tensor(t_image)) / 2
+                image = TF.to_pil_image(image)
+                
+        return image
     
     
 def collate_fn(batch):

@@ -2,6 +2,7 @@ import torch
 import random
 import torchvision.transforms.functional as TF
 from utils import *
+from typing import Optional
 
 
 
@@ -219,16 +220,17 @@ def transform4test(image, bboxes, category_ids, is_crowds, ch_option):
 
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    if ch_option == 'mean':
-        mean = sum(mean) / len(mean)
-        std = sum(std) / len(std)
+    if ch_option.get('num_ch') == 1:
+        if ch_option.get('one_ch_option') == 'mean':
+            mean = sum(mean) / len(mean)
+            std = sum(std) / len(std)
 
     new_image = image
     new_bboxes = bboxes
     new_category_ids = category_ids
     new_is_crowds = is_crowds
 
-    new_image, new_boxes = resize(new_image, new_bboxes, dims=(300, 300))
+    new_image, new_bboxes = resize(new_image, new_bboxes, dims=(300, 300))
     new_image = TF.to_tensor(new_image)
     new_image = TF.normalize(new_image, mean=mean, std=std)
 
@@ -240,9 +242,10 @@ def default_transform(image, bboxes, category_ids, is_crowds, ch_option):
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
     
-    if ch_option == 'mean':
-        mean = [sum(mean) / len(mean)]
-        std = [sum(std) / len(std)]
+    if ch_option.get('num_ch') == 1:
+        if ch_option.get('one_ch_option') == 'mean':
+            mean = [sum(mean) / len(mean)]
+            std = [sum(std) / len(std)]
 
     new_image = image
     new_bboxes = bboxes

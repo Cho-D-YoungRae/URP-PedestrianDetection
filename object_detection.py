@@ -1,10 +1,10 @@
-from typing import Optional
 from torch import nn
 from utils import *
 import torch.nn.functional as F
 from math import sqrt
 from itertools import product as product
 import base_model
+from dataset import default_ch_option
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -213,12 +213,12 @@ class SSD300(nn.Module):
     The SSD300 network - encapsulates the base VGG network, auxiliary, and prediction convolutions.
     """
 
-    def __init__(self, n_classes, base, one_ch_option: Optional[str]=None):
+    def __init__(self, n_classes, base, ch_option=default_ch_option):
         super(SSD300, self).__init__()
 
         self.n_classes = n_classes
 
-        self.base = getattr(base_model, base)(one_ch_option)
+        self.base = getattr(base_model, base)(ch_option)
         self.aux_convs = AuxiliaryConvolutions()
         self.pred_convs = PredictionConvolutions(n_classes)
 

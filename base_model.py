@@ -9,10 +9,10 @@ class VGGBase(nn.Module):
     VGG base convolutions to produce lower-level feature maps.
     """
 
-    def __init__(self, one_ch_option: Optional[str]):
+    def __init__(self, ch_option):
         super(VGGBase, self).__init__()
-        self.one_ch_option = one_ch_option
-        in_channels = 1 if self.one_ch_option else 3
+        self.ch_option = ch_option
+        in_channels = self.ch_option.get('num_ch')
         # Standard convolutional layers in VGG16
         self.conv1_1 = nn.Conv2d(in_channels, 64, kernel_size=3, padding=1)  # stride = 1, by default
         self.conv1_2 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
@@ -43,7 +43,7 @@ class VGGBase(nn.Module):
         self.conv7 = nn.Conv2d(1024, 1024, kernel_size=1)
 
         # Load pretrained layers
-        self.load_pretrained_layers(self.one_ch_option)
+        self.load_pretrained_layers()
 
     def forward(self, image):
         """
@@ -83,7 +83,7 @@ class VGGBase(nn.Module):
         # Lower-level feature maps
         return conv4_3_feats, conv7_feats
 
-    def load_pretrained_layers(self, one_ch_option: Optional[str]):
+    def load_pretrained_layers(self):
         """
         As in the paper, we use a VGG-16 pretrained on the ImageNet task as the base network.
         There's one available in PyTorch, see https://pytorch.org/docs/stable/torchvision/models.html#torchvision.models.vgg16
@@ -97,11 +97,12 @@ class VGGBase(nn.Module):
         # Pretrained VGG base
         pretrained_state_dict = torchvision.models.vgg16(pretrained=True).state_dict()
         pretrained_param_names = list(pretrained_state_dict.keys())
-        if one_ch_option:
-            if one_ch_option == "mean":
+        
+        if self.ch_option.get('num_ch') == 1:
+            if self.ch_option.get('one_ch_option') == "mean":
                 state_dict[param_names[0]] = \
                     torch.mean(pretrained_state_dict[pretrained_param_names[0]], dim=1, keepdim=True)
-        else:
+        elif self.ch_option.get('num_ch') == 3:
             state_dict[param_names[0]] = pretrained_state_dict[pretrained_param_names[0]]
             
         # Transfer conv. parameters from pretrained model to current model
