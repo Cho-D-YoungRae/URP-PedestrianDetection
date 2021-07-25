@@ -21,6 +21,7 @@ default_ch_option = {'num_ch': 1,
                      'img_type': 'lwir',
                      'one_ch_option': 'mean'}
 
+
 class KaistPDDataset(Dataset):
 
     def __init__(self, 
@@ -80,8 +81,11 @@ class KaistPDDataset(Dataset):
         is_crowds = torch.ByteTensor(is_crowds)
 
         if self.transform:
-            image, bboxes, category_ids, is_crowds =\
-                self.transform(image, bboxes, category_ids, is_crowds, self.ch_option)
+            image, bboxes, category_ids, is_crowds = self.transform(image, 
+                                                                    bboxes=bboxes,
+                                                                    category_ids=category_ids,
+                                                                    is_crowds=is_crowds,
+                                                                    ch_option=self.ch_option)                
 
         return image, bboxes, category_ids, is_crowds
     
@@ -113,6 +117,7 @@ class KaistPDDataset(Dataset):
                 image = TF.to_pil_image(image)
                 
         return image
+    
     
     
 def collate_fn(batch):
