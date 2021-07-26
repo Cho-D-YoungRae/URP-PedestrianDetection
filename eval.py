@@ -87,10 +87,10 @@ def get_image(data_dir, img_path, ch_option):
 
 
 def evaluate(model,
+             ch_option=dataset.default_ch_option,
              min_score=0.2,
              max_overlap=0.5,
              top_k=200,
-             ch_option=dataset.default_ch_option,
              json_path='submission.json',
              data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD"):
 
@@ -117,7 +117,7 @@ def evaluate(model,
                                                             min_score=min_score,
                                                             max_overlap=max_overlap,
                                                             top_k=top_k,
-                                                            one_ch_option=ch_option)
+                                                            ch_option=ch_option)
         
         for i in range(len(det_labels)):
             det_label = det_labels[i]
