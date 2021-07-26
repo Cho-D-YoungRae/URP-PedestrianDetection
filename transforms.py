@@ -216,7 +216,7 @@ def photometric_distort(image):
     return new_image
 
 
-def transform4test(image, bboxes, category_ids, is_crowds, ch_option):
+def basic_transform(image, bboxes, category_ids, is_crowds, ch_option):
 
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]

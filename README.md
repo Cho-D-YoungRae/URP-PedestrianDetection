@@ -15,9 +15,14 @@
 - [ ] DataAugmentation 적용
 
 ## Question
-- [ ] convolution, fully-connected layer 에서 bias 를 사용할 때와 사용하지 않을 때의 차이
+- [x] convolution, fully-connected layer 에서 bias 를 사용할 때와 사용하지 않을 때의 차이
+  - https://excelsior-cjh.tistory.com/180
+  - https://stackoverflow.com/questions/45134831/is-bias-necessarily-need-at-colvolution-layer
+  - https://github.com/KaimingHe/deep-residual-networks/issues/10
+  - https://stackoverflow.com/questions/51959507/does-bias-in-the-convolutional-layer-really-make-a-difference-to-the-test-accura
 - [x] missrate, false positive per image
   - https://stackoverflow.com/questions/57511274/understanding-miss-rate-vs-fppi-metric-for-object-detection
+
 ## Problem
 1. loss 가 nan이 되는 현상
 - https://velog.io/@0hye/PyTorch-Nan-Loss-%EA%B2%80%EC%B6%9C-%EB%B0%A9%EB%B2%95
@@ -74,3 +79,18 @@
 ### 11 (9) - Miss Rate: 28.55%, Recall: 0.8131241084165478
 - epoch 100
 > 8~11 의 그래프를 확인했을 때 epoch가 증가한다고 loss 가 크게 떨어지지 않고 decay_lr 이 적용되는 첫 번째 지점에서만 어느 정도 폭으로 한번 감소 후 더 이상 감소하지 않는다. 9~11 점수를 봐도 크게 차이가 없는 것을 알 수 있다(이정도 차이는 발생할 수 있다). 그렇기 때문에 빠른 실험을 위해 **epoch 100을 사용하자**
+
+### 12 (11) - Miss Rate: 28.25%%, Recall: 0.8172804532577904
+- BatchNorm 적용
+> 
+
+### 13 (12)
+- visible image 사용
+
+### 14 (12)
+- visible + lwir image 사용
+
+### 15 (7)
+- DataAugmentation 적용 X
+- train-val set
+- VGG16bn

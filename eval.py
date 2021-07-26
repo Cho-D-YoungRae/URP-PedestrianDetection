@@ -7,6 +7,7 @@ from tqdm.auto import tqdm
 import json
 import Evaluation_official
 import os.path
+import dataset
 
 
 def get_object_list(model,
@@ -14,15 +15,15 @@ def get_object_list(model,
                     min_score,
                     max_overlap,
                     top_k,
-                    one_ch_option: Optional[str],
+                    ch_option,
                     suppress=None):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Transform
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    if one_ch_option:
-        if one_ch_option == 'mean':
+    if ch_option.get('num_ch') == 1:
+        if ch_option.get('one_ch_option') == 'mean':
             mean = sum(mean) / len(mean)
             std = sum(std) / len(std)
     image = TF.normalize(TF.to_tensor(TF.resize(original_image, size=(300, 300))),
@@ -55,16 +56,44 @@ def get_object_list(model,
     return det_boxes, det_labels, det_scores
 
 
+def get_image(data_dir, img_path, ch_option):
+    img_dir, img_name = os.path.split(img_path)
+    if ch_option.get('num_ch') == 1:
+        if ch_option.get('img_type') in {'lwir', 'visible'}:
+            img_path = os.path.join(
+                img_dir, ch_option.get('img_type'), img_name)
+            image = Image.open(img_path)
+            image = image.convert('L')
+
+    elif ch_option.get('num_ch') == 3:
+        if ch_option.get('img_type') in {'lwir', 'visible'}:
+            img_path = os.path.join(
+                data_dir, img_dir, ch_option.get('img_type'), img_name)
+            image = Image.open(img_path)
+            image = image.convert('RGB')
+        elif ch_option.get('img_type') == 'add':
+            c_img_path = os.path.join(
+                data_dir, img_dir, 'visible', img_name)
+            c_image = Image.open(c_img_path)
+            
+            t_img_path = os.path.join(
+                data_dir, img_dir, 'lwir', img_name)
+            t_image = Image.open(t_img_path)
+            
+            image = (TF.to_tensor(c_image) + TF.to_tensor(t_image)) / 2
+            image = TF.to_pil_image(image)
+            
+    return image
+
+
 def evaluate(model,
              min_score=0.2,
              max_overlap=0.5,
              top_k=200,
-             img_type='lwir',
-             one_ch_option='mean',
+             ch_option=dataset.default_ch_option,
              json_path='submission.json',
              data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD"):
-    assert img_type in {'lwir'}
-    assert one_ch_option in {'mean'}
+
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
@@ -81,19 +110,14 @@ def evaluate(model,
     detections = []
     
     for image_id, img_path in tqdm(enumerate(img_paths, 0)):
-        img_dir, img_name = os.path.split(img_path)
-        img_path = os.path.join(
-            data_dir, img_dir, img_type, img_name)
-        image = Image.open(img_path)
-        if img_type == 'lwir':
-            image = image.convert('L')
+        image = get_image(data_dir, img_path, ch_option)
 
         det_boxes, det_labels, det_scores = get_object_list(model=model,
                                                             original_image=image,
                                                             min_score=min_score,
                                                             max_overlap=max_overlap,
                                                             top_k=top_k,
-                                                            one_ch_option=one_ch_option)
+                                                            one_ch_option=ch_option)
         
         for i in range(len(det_labels)):
             det_label = det_labels[i]
