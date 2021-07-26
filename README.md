@@ -82,15 +82,10 @@
 
 ### 12 (11) - Miss Rate: 28.25%%, Recall: 0.8172804532577904
 - BatchNorm 적용
-> 
 
-### 13 (12)
+### 13 (12) - Miss Rate: 35.52%, Recall: 0.7742175856929955
 - visible image 사용
 
 ### 14 (12)
 - visible + lwir image 사용
 
-### 15 (7)
-- DataAugmentation 적용 X
-- train-val set
-- VGG16bn

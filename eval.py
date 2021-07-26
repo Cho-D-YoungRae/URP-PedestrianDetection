@@ -61,7 +61,7 @@ def get_image(data_dir, img_path, ch_option):
     if ch_option.get('num_ch') == 1:
         if ch_option.get('img_type') in {'lwir', 'visible'}:
             img_path = os.path.join(
-                img_dir, ch_option.get('img_type'), img_name)
+                data_dir, img_dir, ch_option.get('img_type'), img_name)
             image = Image.open(img_path)
             image = image.convert('L')
 
