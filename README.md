@@ -1,18 +1,10 @@
 # URP_PD
 2021 summer URP. Pedestrian Detection
 
-## Todo
-- [x] optimizer: SGD -> Adam
-- [ ] lwir + visible_L, lwir + visible_RGB
-- [ ] lwir, visible 데이터 확인.
-  - lwir 만 사용할 것이 아니라 모두 사용할 이유를 찾자
-- [ ] 예측한 데이터 확인
-  - 어떤 데이터를 제대로 예측하지 못 했는지 확인하자
-- [ ] FocalLoss
-- [ ] ground truth 의 scale 과 aspect ratio 분석 후 default box 다시 세팅해보기
-- [ ] vgg16_bn 을 통해 VGGbnBase 만들어보기
-- [ ] ResNetBase 만들어 보기
-- [ ] DataAugmentation 적용
+SSD에 Segmentation Loss 추가하여 Multi Task Learning
+
+## Reference
+- [Illuminating Pedestrians via Simultaneous Detection & Segmentation](https://arxiv.org/abs/1706.08564)
 
 ## Question
 - [x] convolution, fully-connected layer 에서 bias 를 사용할 때와 사용하지 않을 때의 차이
@@ -27,6 +19,13 @@
 1. loss 가 nan이 되는 현상
 - https://velog.io/@0hye/PyTorch-Nan-Loss-%EA%B2%80%EC%B6%9C-%EB%B0%A9%EB%B2%95
 - https://powerofsummary.tistory.com/165
+
+
+## Pseudo GT
+> Segmentation Loss 적용을 위해 필요...
+
+### 1
+- Box 모양 그대로 Segmentation GT 생성
 
 ## Baseline
 
@@ -89,3 +88,11 @@
 ### 14 (12)
 - visible + lwir image 사용
 
+### 15 (13)
+- epoch 1e-3
+
+### 16 (12)
+- evaluate every 10 epochs
+
+### 17 (13)
+- evaluate every 10 epochs

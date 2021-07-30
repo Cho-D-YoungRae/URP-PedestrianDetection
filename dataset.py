@@ -1,4 +1,3 @@
-from typing import Optional
 from torch.utils.data import Dataset
 import torch
 import json
@@ -6,6 +5,7 @@ import os
 from PIL import Image
 from transforms import default_transform
 import torchvision.transforms.functional as TF
+from torch.nn.functional import interpolate
 
 """
 ch_options
@@ -28,6 +28,7 @@ class KaistPDDataset(Dataset):
                  data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
                  ch_option=default_ch_option,
                  transform=default_transform,
+                 is_sds: bool=False,
                  split: str='train',
                  keep_strange: bool=False,
                  ):
@@ -36,6 +37,7 @@ class KaistPDDataset(Dataset):
         self.keep_strange = keep_strange
         self.ch_option = ch_option
         self.transform = transform
+        self.is_sds = is_sds
 
         assert self.split in {'train', 'test'}
 
@@ -76,18 +78,30 @@ class KaistPDDataset(Dataset):
             bboxes.append(annotation['bbox'])
             category_ids.append(annotation['category_id'])
             is_crowds.append(annotation['is_crowd'])
+            
+        data = []
+        if self.is_sds:
+            seg_gt_size = (image.height, image.width)
+            pseudo_seg_gt = torch.zeros(seg_gt_size)
+            for bbox in bboxes:
+                x_min, y_min, x_max, y_max = bbox
+                pseudo_seg_gt[y_min:y_max+1, x_min:x_max+1] = 1
+            data.append(pseudo_seg_gt.unsqueeze(0))
+            
         bboxes = torch.FloatTensor(bboxes)
         category_ids = torch.LongTensor(category_ids)
         is_crowds = torch.ByteTensor(is_crowds)
-
+        
         if self.transform:
             image, bboxes, category_ids, is_crowds = self.transform(image, 
                                                                     bboxes=bboxes,
                                                                     category_ids=category_ids,
                                                                     is_crowds=is_crowds,
                                                                     ch_option=self.ch_option)                
-
-        return image, bboxes, category_ids, is_crowds
+        data = [image, bboxes, category_ids, is_crowds] + data
+        
+        return data
+    
     
     def _get_image(self, idx):
         img_dir, img_name = os.path.split(self.img_paths[idx])
@@ -135,3 +149,21 @@ def collate_fn(batch):
     images = torch.stack(images, dim=0)
 
     return images, bboxes, category_ids, is_crowds
+
+def sds_collate_fn(batch):
+    images = []
+    bboxes = []
+    category_ids = []
+    is_crowds = []
+    pseudo_seg_gts = []
+
+    for b in batch:
+        images.append(b[0])
+        bboxes.append(b[1])
+        category_ids.append(b[2])
+        is_crowds.append(b[3])
+        pseudo_seg_gts.append(b[4])
+        
+    images = torch.stack(images, dim=0)
+    pseudo_seg_gts = torch.stack(pseudo_seg_gts, dim=0)
+    return images, bboxes, category_ids, is_crowds, pseudo_seg_gts
