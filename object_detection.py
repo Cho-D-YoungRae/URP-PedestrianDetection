@@ -542,3 +542,26 @@ class MultiBoxLoss(nn.Module):
         # TOTAL LOSS
 
         return conf_loss + self.alpha * loc_loss
+
+
+class SDSSSD300(SSD300):
+    
+    def __init__(self, n_classes, base, ch_option=default_ch_option,
+                 usage_seg_feat=[True, False, False, False, False, False]):
+        super(SDSSSD300, self).__init__(n_classes, base, ch_option)
+        self.usage_seg_feat = usage_seg_feat
+        assert len(self.usage_seg_feat) == 6 and 0 < self.usage_seg_feat <= 6
+        
+        in_ch_list = [512, 1024, 512, 256, 256, 256]
+        self.seg_infusion_layers = nn.ModuleList()
+        for i, in_channels in enumerate(in_ch_list):
+            if self.usage_seg_feat[i]:
+                seg_infusion_layer = nn.Conv2d(in_channels, self.n_classes, kernel_size=1)
+                self.seg_infusion_layers.append(seg_infusion_layer)
+        self._init_seg()
+        
+    def _init_seg(self):
+        for c in self.seg_infusion_layers:
+            if isinstance(c, nn.Conv2d):
+                nn.init.xavier_normal_(c.weight)
+                nn.init.constant_(c.bias, 0.)
