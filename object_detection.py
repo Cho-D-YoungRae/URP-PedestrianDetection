@@ -547,21 +547,52 @@ class MultiBoxLoss(nn.Module):
 class SDSSSD300(SSD300):
     
     def __init__(self, n_classes, base, ch_option=default_ch_option,
-                 usage_seg_feat=[True, False, False, False, False, False]):
+                 usages_seg_feat=[True, False, False, False, False, False]):
         super(SDSSSD300, self).__init__(n_classes, base, ch_option)
-        self.usage_seg_feat = usage_seg_feat
-        assert len(self.usage_seg_feat) == 6 and 0 < self.usage_seg_feat <= 6
+        self.usages_seg_feat = usages_seg_feat
+        assert len(self.usages_seg_feat) == 6 and 0 < self.usages_seg_feat <= 6
         
         in_ch_list = [512, 1024, 512, 256, 256, 256]
         self.seg_infusion_layers = nn.ModuleList()
         for i, in_channels in enumerate(in_ch_list):
-            if self.usage_seg_feat[i]:
+            if self.usages_seg_feat[i]:
                 seg_infusion_layer = nn.Conv2d(in_channels, self.n_classes, kernel_size=1)
                 self.seg_infusion_layers.append(seg_infusion_layer)
         self._init_seg()
-        
+    
+    
     def _init_seg(self):
         for c in self.seg_infusion_layers:
             if isinstance(c, nn.Conv2d):
                 nn.init.xavier_normal_(c.weight)
                 nn.init.constant_(c.bias, 0.)
+                
+    
+    def forward(self, image):
+        conv4_3_feats, conv7_feats = self.base(image) 
+
+        norm = conv4_3_feats.pow(2).sum(dim=1, keepdim=True).sqrt() 
+        conv4_3_feats = conv4_3_feats / norm
+        conv4_3_feats = conv4_3_feats * self.rescale_factors 
+    
+        conv8_2_feats, conv9_2_feats, conv10_2_feats, conv11_2_feats = \
+            self.aux_convs(conv7_feats)
+
+        feats4pred = [conv4_3_feats, conv7_feats, conv8_2_feats, 
+                      conv9_2_feats, conv10_2_feats, conv11_2_feats]
+        if self.training:
+            feats4seg = []
+            for i, usage_seg_feat in enumerate(self.usages_seg_feat):
+                if usage_seg_feat:
+                    feats4seg.append(feats4pred[i])
+            
+            locs, classes_scores = self.pred_convs(*feats4pred)
+            for i, seg_infusion_layer in enumerate(self.seg_infusion_layers):
+                feats4seg[i] = seg_infusion_layer(feats4seg[i])
+                
+            return locs, classes_scores, feats4seg
+        
+        else:
+            locs, classes_scores = self.pred_convs(*feats4pred)
+            
+            return locs, classes_scores

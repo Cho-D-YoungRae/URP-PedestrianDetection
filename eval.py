@@ -96,6 +96,7 @@ def evaluate(model,
 
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.eval()
     model.to(device)
     data_name_txt = 'test-all-20.txt'
     with open(os.path.join(data_dir, data_name_txt), 'r') as f:
