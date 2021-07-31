@@ -82,7 +82,7 @@ class KaistPDDataset(Dataset):
         data = []
         if self.is_sds:
             seg_gt_size = (image.height, image.width)
-            pseudo_seg_gt = torch.zeros(seg_gt_size, dtype=torch.int32)
+            pseudo_seg_gt = torch.zeros(seg_gt_size)
             for bbox in bboxes:
                 x_min, y_min, x_max, y_max = bbox
                 pseudo_seg_gt[y_min:y_max+1, x_min:x_max+1] = 1
