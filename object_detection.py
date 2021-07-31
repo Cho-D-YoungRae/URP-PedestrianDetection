@@ -589,10 +589,11 @@ class SDSSSD300(SSD300):
                     feats4seg.append(feats4pred[i])
             
             locs, classes_scores = self.pred_convs(*feats4pred)
+            segmentations = []
             for i, seg_infusion_layer in enumerate(self.seg_infusion_layers):
-                feats4seg[i] = seg_infusion_layer(feats4seg[i])
+                segmentations.append(seg_infusion_layer(feats4seg[i]))
                 
-            return locs, classes_scores, feats4seg
+            return locs, classes_scores, segmentations
         
         else:
             locs, classes_scores = self.pred_convs(*feats4pred)
