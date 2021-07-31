@@ -552,6 +552,7 @@ class SDSSSD300(SSD300):
                  usages_seg_feats=[True, True, False, False, False, False]):
         super(SDSSSD300, self).__init__(n_classes, base, ch_option)
         self.usages_seg_feats = usages_seg_feats
+        
         assert len(self.usages_seg_feats) == 6 and 0 < sum(self.usages_seg_feats) <= 6
         
         in_ch_list = [512, 1024, 512, 256, 256, 256]
