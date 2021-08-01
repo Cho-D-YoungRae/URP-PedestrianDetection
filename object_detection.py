@@ -725,7 +725,7 @@ class SDSMultiBoxLoss(nn.Module):
             seg = segmentations[i]
             seg_loss = self.cross_entropy(seg.view(-1, n_classes), seg_labels.view(-1))
             total_seg_loss = total_seg_loss + torch.mean(seg_loss)
-        total_seg_loss = total_seg_loss / len(self.seg_sizes)
+        
             
             
         # TOTAL LOSS

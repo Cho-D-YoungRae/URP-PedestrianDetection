@@ -1,9 +1,15 @@
 # URP_PD
 2021 summer URP. Pedestrian Detection
 
-SSD에 Segmentation Loss 추가하여 Multi Task Learning
+SSD에 Segmentation Loss 추가하여 Multi Task Learning (SDS: Simultaneous Detection & Segmentation)
+
+## Todo
+- [ ] Conv feature 별 Segmentation Loss 비율 확인해보고 weight 설정 고민해보기
 
 ## Reference
+- [Code Base](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection)
+### Paper
+- [SSD: Single Shot MultiBox Detector](https://arxiv.org/abs/1512.02325)
 - [Illuminating Pedestrians via Simultaneous Detection & Segmentation](https://arxiv.org/abs/1706.08564)
 
 ## Question
@@ -96,3 +102,12 @@ SSD에 Segmentation Loss 추가하여 Multi Task Learning
 
 ### 17 (13)
 - evaluate every 10 epochs
+
+### 18 - Miss Rate: 29.03%%, Recall: 0.8101983002832861
+- segmentation infusion layers 적용
+- usages_seg_feats = [True, True, False, False, False, False]
+- total_seg_loss 의 평균 사용
+- 추가적인 적용 X
+
+### 19 (18) - Miss Rate: 26.09%, Recall: 0.8295615275813296
+- total_seg_loss 의 합 사용 (평균 X)
