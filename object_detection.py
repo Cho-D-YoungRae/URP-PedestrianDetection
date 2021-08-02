@@ -572,6 +572,7 @@ class SDSSSD300(SSD300):
                 
     
     def forward(self, image):
+        #==== 기존 SSD Tutorial code 와 같음 ====# start
         conv4_3_feats, conv7_feats = self.base(image) 
 
         norm = conv4_3_feats.pow(2).sum(dim=1, keepdim=True).sqrt() 
@@ -580,22 +581,30 @@ class SDSSSD300(SSD300):
     
         conv8_2_feats, conv9_2_feats, conv10_2_feats, conv11_2_feats = \
             self.aux_convs(conv7_feats)
-
+        #==== 기존 SSD Tutorial code 와 같음 ====# end
+        
+        # SSD 에서 score, box prediction 을 위한 feature list 에 담아둠
         feats4pred = [conv4_3_feats, conv7_feats, conv8_2_feats, 
                       conv9_2_feats, conv10_2_feats, conv11_2_feats]
-        if self.training:
+        if self.training:   # Segmentation model 은 train 시에만 사용
+            # 위 feats4pred 의 feature map 중 (같은 backbone 을 통해 생성된 것 공유)
+            # Segmentation 을 위해 사용할 feature map 선택
             feats4seg = []
             for i, usage_seg_feats in enumerate(self.usages_seg_feats):
                 if usage_seg_feats:
                     feats4seg.append(feats4pred[i])
             
+            # score, box prediction (기존 SSD와 같으나 list에 담아둔 feature 를 넘겨줌)
             locs, classes_scores = self.pred_convs(*feats4pred)
+            # Segmentation 을 진행하는 부분. 위에서 선택한 feature map만 이용
+            # self.seg_infusion_layers: 각 feature map을 이용하는 segmentation 모델을 담아둔 ModuleList
             segmentations = []
             for i, seg_infusion_layer in enumerate(self.seg_infusion_layers):
                 segmentations.append(seg_infusion_layer(feats4seg[i]))
-                
+            
             return locs, classes_scores, segmentations
         
+        # train 이 아닐 때는 Segmentation 모델은 이용하지 않는다.
         else:
             locs, classes_scores = self.pred_convs(*feats4pred)
             
@@ -726,8 +735,6 @@ class SDSMultiBoxLoss(nn.Module):
             seg_loss = self.cross_entropy(seg.view(-1, n_classes), seg_labels.view(-1))
             total_seg_loss = total_seg_loss + torch.mean(seg_loss)
         
-            
-            
         # TOTAL LOSS
         total_loss = conf_loss + self.alpha * loc_loss + total_seg_loss
         

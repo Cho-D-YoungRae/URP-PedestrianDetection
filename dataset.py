@@ -5,7 +5,6 @@ import os
 from PIL import Image
 from transforms import default_transform
 import torchvision.transforms.functional as TF
-from torch.nn.functional import interpolate
 
 """
 ch_options

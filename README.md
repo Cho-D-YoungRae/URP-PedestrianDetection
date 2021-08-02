@@ -5,6 +5,8 @@ SSD에 Segmentation Loss 추가하여 Multi Task Learning (SDS: Simultaneous Det
 
 ## Todo
 - [ ] Conv feature 별 Segmentation Loss 비율 확인해보고 weight 설정 고민해보기
+- [ ] faster-rcnn 에서는 모든 크기의 box를 한 feature map에서 검출하지만 ssd는 각 feature map 별로 검출하는 box 크기가 다르다. 그렇기 때문에 segmentation mask 를 만들 때 해당 feature map에서 검출되지 않을 것은 뺴야될 것 같다. IOU 생각해서 합리적으로 계산 해보자. 범위 안에 들지 않는 object 는 0(배경) 으로 할지 -1(무시: CrossEntropy 계산에서 제외 가능한 듯 ignore_index) 로 할지
+- [ ] 애초에 segmentation 자체가 제대로 이루어지지 않는듯... 3*3 conv 를 segmentation layers 에 추가해야하나...? segmentation loss 를 출력해보며 제대로 학습이 되고 있는 것인지 확인
 
 ## Reference
 - [Code Base](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection)
@@ -86,12 +88,15 @@ SSD에 Segmentation Loss 추가하여 Multi Task Learning (SDS: Simultaneous Det
 > 8~11 의 그래프를 확인했을 때 epoch가 증가한다고 loss 가 크게 떨어지지 않고 decay_lr 이 적용되는 첫 번째 지점에서만 어느 정도 폭으로 한번 감소 후 더 이상 감소하지 않는다. 9~11 점수를 봐도 크게 차이가 없는 것을 알 수 있다(이정도 차이는 발생할 수 있다). 그렇기 때문에 빠른 실험을 위해 **epoch 100을 사용하자**
 
 ### 12 (11) - Miss Rate: 28.25%%, Recall: 0.8172804532577904
+> MR(all): 27.93, MR(day): 33.82, MR(night): 16.06
 - BatchNorm 적용
 
 ### 13 (12) - Miss Rate: 35.52%, Recall: 0.7742175856929955
+> MR(all): 36.34 MR(day): 33.86 MR(night): 42.52
 - visible image 사용
 
 ### 14 (12)
+> MR(all): 34.75 MR(day): 35.27 MR(night): 33.55
 - visible + lwir image 사용
 
 ### 15 (13)
@@ -104,10 +109,40 @@ SSD에 Segmentation Loss 추가하여 Multi Task Learning (SDS: Simultaneous Det
 - evaluate every 10 epochs
 
 ### 18 - Miss Rate: 29.03%%, Recall: 0.8101983002832861
+> MR(all): 29.02 MR(day): 33.77 MR(night): 19.17
 - segmentation infusion layers 적용
 - usages_seg_feats = [True, True, False, False, False, False]
 - total_seg_loss 의 평균 사용
 - 추가적인 적용 X
 
 ### 19 (18) - Miss Rate: 26.09%, Recall: 0.8295615275813296
+> MR(all): 26.33 MR(day): 31.38 MR(night): 15.89
 - total_seg_loss 의 합 사용 (평균 X)
+
+### 20 (19)
+> MR(all): 27.72 MR(day): 32.78 MR(night): 16.59
+- usages_seg_feats = [True, True, True, False, False, False]
+
+### 21 (20)
+> MR(all): 27.12 MR(day): 33.33 MR(night): 14.15
+- segmentation 에 3*3 conv 추가
+```python
+# seg_infusion_layer = nn.Conv2d(in_channels, self.n_classes, kernel_size=1)
+seg_infusion_layer = nn.Sequential(
+    nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1),
+    nn.Conv2d(in_channels, self.n_classes, kernel_size=1)
+)
+```
+
+### 22 (19)
+- usages_seg_feats = [True, True, True, True, True, True]
+
+### 23 (19)
+- usages_seg_feats = [True, False, False, False, False, False]
+
+### 24 (23)
+> conv_feats 을 통해 얻은 torch.mean(seg_loss)을 이용하고 있었다 -> 이로 인해 loss가 너무 작아 학습이 제대로 이루어지지 않은 듯
+- segmentation loss 가 잘 떨어지고 있는지 확인
+
+### 25 (24)
+- torch.sum(seg_loss) 으로 변경
