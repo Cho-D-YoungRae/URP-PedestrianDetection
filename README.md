@@ -4,9 +4,12 @@
 SSD에 Segmentation Loss 추가하여 Multi Task Learning (SDS: Simultaneous Detection & Segmentation)
 
 ## Todo
-- [ ] Conv feature 별 Segmentation Loss 비율 확인해보고 weight 설정 고민해보기
+- [x] Conv feature 별 Segmentation Loss 비율 확인해보고 weight 설정 고민해보기
+  - 학습은 제대로 되고있었는듯... segmentation mask 만들 때 SSD 기본으로 적용되어있던 data augmentation 고려하지 못함
 - [ ] faster-rcnn 에서는 모든 크기의 box를 한 feature map에서 검출하지만 ssd는 각 feature map 별로 검출하는 box 크기가 다르다. 그렇기 때문에 segmentation mask 를 만들 때 해당 feature map에서 검출되지 않을 것은 뺴야될 것 같다. IOU 생각해서 합리적으로 계산 해보자. 범위 안에 들지 않는 object 는 0(배경) 으로 할지 -1(무시: CrossEntropy 계산에서 제외 가능한 듯 ignore_index) 로 할지
-- [ ] 애초에 segmentation 자체가 제대로 이루어지지 않는듯... 3*3 conv 를 segmentation layers 에 추가해야하나...? segmentation loss 를 출력해보며 제대로 학습이 되고 있는 것인지 확인
+  - 큰 개선이 필요하기 때문에 별도의 파일로 다시 만드는게 좋을 듯
+- [x] 애초에 segmentation 자체가 제대로 이루어지지 않는듯... 3*3 conv 를 segmentation layers 에 추가해야하나...? segmentation loss 를 출력해보며 제대로 학습이 되고 있는 것인지 확인
+  - 논문에 segmentation layer 를 깊게 쌓지 않는 이유에 대해서 자세히 나온다
 
 ## Reference
 - [Code Base](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection)
@@ -146,3 +149,6 @@ seg_infusion_layer = nn.Sequential(
 
 ### 25 (24)
 - torch.sum(seg_loss) 으로 변경
+
+### 26
+- 앞에서는 segmentation gt 를 생성할 때 image 들의 transform 을 고려하지 못 했다. 이를 해결함.

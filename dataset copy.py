@@ -3,10 +3,8 @@ import torch
 import json
 import os
 from PIL import Image
-import transforms
-import transforms_sds
+from transforms import default_transform
 import torchvision.transforms.functional as TF
-
 
 """
 ch_options
@@ -28,7 +26,7 @@ class KaistPDDataset(Dataset):
     def __init__(self, 
                  data_dir="/content/drive/MyDrive/2021.summer_URP/PD/KAIST_PD",
                  ch_option=default_ch_option,
-                 transform=transforms.default_transform,
+                 transform=default_transform,
                  is_sds: bool=False,
                  split: str='train',
                  keep_strange: bool=False,
@@ -39,8 +37,7 @@ class KaistPDDataset(Dataset):
         self.ch_option = ch_option
         self.transform = transform
         self.is_sds = is_sds
-        if self.is_sds and self.transform == transforms.default_transform:
-            self.transform = transforms_sds.default_transform
+
         assert self.split in {'train', 'test'}
 
         data_name_txt = self.split + '-all-20.txt'
@@ -94,9 +91,13 @@ class KaistPDDataset(Dataset):
         category_ids = torch.LongTensor(category_ids)
         is_crowds = torch.ByteTensor(is_crowds)
         
-        data = [image, bboxes, category_ids, is_crowds] + data
         if self.transform:
-            data = self.transform(*data, ch_option=self.ch_option)                
+            image, bboxes, category_ids, is_crowds = self.transform(image, 
+                                                                    bboxes=bboxes,
+                                                                    category_ids=category_ids,
+                                                                    is_crowds=is_crowds,
+                                                                    ch_option=self.ch_option)                
+        data = [image, bboxes, category_ids, is_crowds] + data
         
         return data
     
