@@ -213,6 +213,7 @@ def default_transform(image, bboxes, category_ids, is_crowds, pseudo_seg_gt, ch_
 
     # Convert PIL image to Torch tensor
     new_image = TF.to_tensor(new_image)
+    new_image = TF.normalize(new_image, mean=mean, std=std)
 
     # Expand image (zoom out) with a 50% chance - helpful for training detection of small objects
     # Fill surrounding space with the mean of ImageNet data that our base VGG was trained on
@@ -233,13 +234,12 @@ def default_transform(image, bboxes, category_ids, is_crowds, pseudo_seg_gt, ch_
             flip(new_image, new_bboxes, new_pseudo_seg_gt)
 
     # Resize image to (300, 300) - this also converts absolute boundary coordinates to their fractional form
-    new_image, new_bboxes, new_pseudo_seg_gt =\
-        resize(new_image, new_bboxes, new_pseudo_seg_gt, dims=(300, 300))
+
 
     # Convert PIL image to Torch tensor
     new_image = TF.to_tensor(new_image)
 
     # Normalize by mean and standard deviation of ImageNet data that our base VGG was trained on
-    new_image = TF.normalize(new_image, mean=mean, std=std)
+    # new_image = TF.normalize(new_image, mean=mean, std=std)
 
     return new_image, new_bboxes, new_category_ids, new_is_crowds, new_pseudo_seg_gt

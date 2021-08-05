@@ -144,11 +144,34 @@ seg_infusion_layer = nn.Sequential(
 - usages_seg_feats = [True, False, False, False, False, False]
 
 ### 24 (23)
-> conv_feats 을 통해 얻은 torch.mean(seg_loss)을 이용하고 있었다 -> 이로 인해 loss가 너무 작아 학습이 제대로 이루어지지 않은 듯
+> conv_feats 을 통해 얻은 torch.mean(seg_loss)을 이용하고 있었다 -> 이로 인해 loss가 너무 작아 학습이 제대로 이루어지지 않은 듯 -> torch.mean 을 쓰는 것이 맞다....
 - segmentation loss 가 잘 떨어지고 있는지 확인
 
 ### 25 (24)
 - torch.sum(seg_loss) 으로 변경
 
-### 26
+### 26 (23)
 - 앞에서는 segmentation gt 를 생성할 때 image 들의 transform 을 고려하지 못 했다. 이를 해결함.
+
+### 27 (26)
+- usages_seg_feats = [True, True, False, False, False, False]
+
+### 28(23)
+- segmentation loss 확인
+
+### 29(21, 26)
+
+### 30(27)
+> MR(all): 26.03 MR(day): 31.31 MR(night): 15.84
+- epochs 150
+
+### 31(27)
+> MR(all): 26.52 MR(day): 31.88 MR(night): 15.08
+- 2 * segmentation_loss
+- 1 epoch 마다 segmentation neptune 기록
+```python
+total_loss = conf_loss + self.alpha * loc_loss + 2 * total_seg_loss
+```
+
+### 32(30)
+- Normalize 가 마지막에 적용되어서 expand 로 인해 채워진 평균값이 흰색으로 된다... Normalize를 처음에 적용해보자
