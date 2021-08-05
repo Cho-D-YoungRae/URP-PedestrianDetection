@@ -10,6 +10,8 @@ SSD에 Segmentation Loss 추가하여 Multi Task Learning (SDS: Simultaneous Det
   - 큰 개선이 필요하기 때문에 별도의 파일로 다시 만드는게 좋을 듯
 - [x] 애초에 segmentation 자체가 제대로 이루어지지 않는듯... 3*3 conv 를 segmentation layers 에 추가해야하나...? segmentation loss 를 출력해보며 제대로 학습이 되고 있는 것인지 확인
   - 논문에 segmentation layer 를 깊게 쌓지 않는 이유에 대해서 자세히 나온다
+- [ ] augmentation 불필요해 보이는 것 빼보기
+- [ ] segmentation loss 때 class imbalance 해결
 
 ## Reference
 - [Code Base](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection)
@@ -178,3 +180,4 @@ total_loss = conf_loss + self.alpha * loc_loss + 2 * total_seg_loss
 
 ### 33(32)
 - expand 의 max_scale=2 로 조정
+- 각각 loss 별 neptuen 기록

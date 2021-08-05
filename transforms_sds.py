@@ -234,7 +234,8 @@ def default_transform(image, bboxes, category_ids, is_crowds, pseudo_seg_gt, ch_
             flip(new_image, new_bboxes, new_pseudo_seg_gt)
 
     # Resize image to (300, 300) - this also converts absolute boundary coordinates to their fractional form
-
+    new_image, new_bboxes, new_pseudo_seg_gt =\
+        resize(new_image, new_bboxes, new_pseudo_seg_gt, dims=(300, 300))
 
     # Convert PIL image to Torch tensor
     new_image = TF.to_tensor(new_image)
