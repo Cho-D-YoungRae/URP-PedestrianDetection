@@ -176,6 +176,7 @@ total_loss = conf_loss + self.alpha * loc_loss + 2 * total_seg_loss
 ```
 
 ### 32(30)
+> MR 가 100이 뜨는데...? 확인해보니 모두 배경으로 인식했다... Normalize 는 가장 마지막에 적용하는 것이 맞는 것 같다.
 - Normalize 가 마지막에 적용되어서 expand 로 인해 채워진 평균값이 흰색으로 된다... Normalize를 처음에 적용해보자
 
 ### 33(32)
