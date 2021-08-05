@@ -614,13 +614,15 @@ class SDSSSD300(SSD300):
 class SDSMultiBoxLoss(nn.Module):
     
     def __init__(self, priors_cxcy, usages_seg_feats, 
-                 threshold=0.5, neg_pos_ratio=3, alpha=1.):
+                 threshold=0.5, neg_pos_ratio=3, alpha=1.,
+                 get_separate_loss: bool=False):
         super(SDSMultiBoxLoss, self).__init__()
         self.priors_cxcy = priors_cxcy
         self.priors_xy = cxcy_to_xy(priors_cxcy)
         self.threshold = threshold
         self.neg_pos_ratio = neg_pos_ratio
         self.alpha = alpha
+        self.get_separate_loss = get_separate_loss
 
         self.smooth_l1 = nn.SmoothL1Loss()        
         self.cross_entropy = nn.CrossEntropyLoss(reduce=False)
@@ -737,6 +739,12 @@ class SDSMultiBoxLoss(nn.Module):
         
         # TOTAL LOSS
         total_loss = conf_loss + self.alpha * loc_loss + total_seg_loss
+        
+        if self.get_separate_loss:
+            separate_loss = {'conf_loss': conf_loss.item(),
+                             'loc_loss': self.alpha * loc_loss.item(),
+                             'total_seg_loss': total_seg_loss.item()}
+            return total_loss, separate_loss
         
         return total_loss
         
